@@ -4,7 +4,8 @@
 
 ## 1. Create a folder and give it a name. For example, AWS_EKS. Or, you can clone this repo by using this command: 
 
-     -> $ git clone 
+     -> $ git clone https://github.com/Messites/aws-eks-terraform.git
+     -> $ cd aws-eks-terraform/ 
 
 ## 2. Inside your working directory (folder), create 6 child directories and name them per your naming convention: 
       
