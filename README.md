@@ -134,6 +134,4 @@ Cloud | DevOps | SRE | AI | Founder of T2S | [LinkedIn](https://www.linkedin.com
 
 ---
 
-## Architecture Overview
 
-![EKS Architecture](./eks.png)
