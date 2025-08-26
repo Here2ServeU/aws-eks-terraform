@@ -1,43 +1,139 @@
-# This Terraform code will help you deploy an EKS (Elastic Kubernetes Service) cluster on AWS.
 
-**The architecture is using modules to accomplish our goal. What that means is you have to organize your code as follows** 
+# AWS EKS Terraform Deployment
 
-## 1. Create a folder and give it a name. For example, AWS_EKS. Or, you can clone this repo by using this command: 
+This project provisions an **Amazon EKS (Elastic Kubernetes Service)** cluster on AWS using **modular Terraform code**. It emphasizes scalability, reusability, and cloud best practices including remote state management via S3.
 
-     -> $ git clone https://github.com/Messites/aws-eks-terraform.git
-     -> $ cd aws-eks-terraform/ 
+---
 
-## 2. Inside your working directory (folder), create 6 child directories and name them per your naming convention: 
-      
-      a) modules
-      b) s3-backend, where you will store the code to create an S3 backend, and your terraform state file will reside. 
+## Project Structure
 
-## 3. Go inside the "modules" directory and create the following:
-      
-      a) eks and add these files, main.tf, variables.tf, and output.tf. 
-      b) iam and add these files, main.tf, and output.tf.
-      c) security_group and add these files, main.tf, variables.tf, and output.tf.
-      d) vpc and add these files, main.tf, variables.tf, and output.tf.
+```bash
+.
+├── main.tf                # Root configuration to call all modules
+├── provider.tf           # AWS provider configuration
+├── terraform.tfvars      # Variable values used by Terraform
+├── variables.tf          # Variable declarations
+├── README.md             # This file
+├── s3-backend/           # Terraform backend (S3 + DynamoDB)
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── provider.tf
+│   └── output.tf
+└── modules/              # All reusable infrastructure modules
+    ├── eks/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── output.tf
+    ├── iam/
+    │   ├── main.tf
+    │   └── output.tf
+    ├── security_group/
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── output.tf
+    └── vpc/
+        ├── main.tf
+        ├── variables.tf
+        └── output.tf
+```
 
-## 4. In the s3-backend module, add these files: main.tf, variables.tf, provider.tf, and output.tf.
+---
 
-## 5. In the parent directory (AWS_EKS, or whatever name you gave it and where you store everything for this deployment), add the following files: README.md, main.tf, provider.tf, variables, and terraform.tfvars. 
+## Getting Started
 
-## 6. Go back to the s3-backend module and run the following commands: 
-            
-            -> $ terraform init
-            -> $ terraform plan
-            -> $ terraform apply
+### 1. Clone the Repository
 
-## 7. Now that you have created an S3 bucket to store your Terraform state file remotely, go back to the parent directory. 
+```bash
+git clone https://github.com/Here2ServeU/aws-eks-terraform.git
+cd aws-eks-terraform/
+```
 
-## 8. Run the following commands: 
-            
-            -> $ terraform init
-            -> $ terraform plan
-            -> $ terraform apply
+### 2. Create Backend for Remote State
 
-There you go! You've deployed your infrastructure, an EKS cluster on AWS using Terraform modules. 
+Navigate to the `s3-backend/` directory and deploy your remote backend:
 
-## 9. Clean up. 
-        -> $ terraform destroy. 
+```bash
+cd s3-backend/
+terraform init
+terraform plan
+terraform apply
+```
+
+> This will create an S3 bucket (and optionally a DynamoDB table) to store the remote Terraform state.
+
+---
+
+### 3. Deploy EKS Infrastructure
+
+Return to the root directory and run the following:
+
+```bash
+cd ..
+terraform init
+terraform plan
+terraform apply
+```
+
+This will provision:
+
+- A VPC with private and public subnets
+- Security groups for EKS control plane and worker nodes
+- IAM roles and policies for EKS and node groups
+- An EKS cluster with managed node groups
+- Container image deployment from ECR
+
+---
+
+## Configuration
+
+Set values in `terraform.tfvars` to customize your environment:
+
+```hcl
+region              = "us-east-1"
+cluster_name        = "t2s-eks-cluster"
+cluster_version     = "1.29"
+vpc_id              = "vpc-xxxxx"
+subnet_ids          = ["subnet-abc123", "subnet-def456"]
+image_url           = "your-ecr-url"
+image_tag           = "latest"
+container_name      = "t2s-container"
+container_port      = 3000
+```
+
+---
+
+## Clean Up
+
+To destroy all resources created:
+
+```bash
+terraform destroy
+```
+
+---
+
+## Prerequisites
+
+- [Terraform 1.6+](https://developer.hashicorp.com/terraform/downloads)
+- AWS CLI configured (`aws configure`)
+- IAM permissions to create VPCs, EKS, IAM, EC2, and S3 resources
+
+---
+
+## Notes
+
+- Use the `modules/` directory to update any specific infrastructure logic (e.g., add new node group types, enable encryption, etc.).
+- Backend configuration (`s3-backend/`) should be created once and reused for all Terraform workspaces or environments.
+
+---
+
+## Author
+
+**Dr. Emmanuel Naweji**  
+Cloud | DevOps | SRE | AI | Founder of T2S | [LinkedIn](https://www.linkedin.com/in/ready2assist/)
+
+---
+
+## Architecture Overview
+
+![EKS Architecture](./eks.png)
